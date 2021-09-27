@@ -11,6 +11,7 @@ class manorSystem:
     __paused = True
     __monitor = {"top": 0, "left": 0, "width": 0, "height": 0}
     __keyboardListener = None
+    __chatWindowTemplate = None
     
     def __onPress(self, key):
         if key == keyboard.Key.pause or key == keyboard.Key.end:
@@ -19,6 +20,7 @@ class manorSystem:
     def __init__(self, *args, **kwargs):
         self.__keyboardListener = keyboard.Listener(on_press=self.__onPress)
         self.__keyboardListener.start()
+        self.__chatWindowTemplate = cv2.imread("assets/chatScroll.png", cv2.IMREAD_GRAYSCALE)
         self.__config = utils.loadJsonFile('config')
         self.__monitor['top'] = int(self.__config['resolutionHeight'] / 5)
         self.__monitor['height'] = int(self.__config['resolutionHeight'] / 5 * 3)
@@ -30,26 +32,33 @@ class manorSystem:
             await asyncio.sleep(3)
         return
 
-    async def __openFirstWindow(self):
+    async def __openChatWindow(self):
         await self.__checkPause()
         pyautogui.press(self.__config['targetButton'])
 
-    async def __detectFirstWindow(self):
+    async def __detectChatWindowScroll(self):
         with mss.mss() as screenshotManager:
-            while "searching first window":
+            while "searching chat window":
                 await self.__checkPause()
                 img = numpy.array(screenshotManager.grab(self.__monitor))
+                processedImage = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+                res = cv2.matchTemplate(processedImage, self.__chatWindowTemplate, cv2.TM_CCOEFF_NORMED)
+                loc = numpy.where(res >= 0.7)
+
+                height = self.__chatWindowTemplate.shape[0]
+                width = self.__chatWindowTemplate.shape[1]
+                for point in zip(*loc[::-1]):
+                    cv2.rectangle(img, point, (point[0] + width, point[1] + height), (0, 255, 0), 3)
 
                 cv2.imshow("test", img)
                 key = cv2.waitKey(1)
 
-                #processedImage = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
     async def run(self):
         while True:
             #with pyautogui.hold('shift'):
-                await self.__openFirstWindow()
-                await self.__detectFirstWindow()
+                await self.__openChatWindow()
+                await self.__detectChatWindowScroll()
 
 
 async def main():
