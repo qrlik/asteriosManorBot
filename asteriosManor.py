@@ -8,23 +8,25 @@ import utils
 import time
 import threading
 
-__config = {}
-__delay = 0.16
-__monitor = {"top": 0, "left": 0, "width": 0, "height": 0}
-__paused = True
-__chatWindowTemplate = None
 __autoPy = AutoHotPy()
+__chatWindowTemplate = cv2.imread("assets/chatScroll.png", cv2.IMREAD_GRAYSCALE)
+__config = utils.loadJsonFile('config')
+__monitor = {"top": 0, "left": 0, "width": 0, "height": 0}
+__delay = 0.0
+__paused = True
     
 def __init():
-    __chatWindowTemplate = cv2.imread("assets/chatScroll.png", cv2.IMREAD_GRAYSCALE)
-    __config = utils.loadJsonFile('config')
-
+    global __monitor
+    global __config
+    global __delay
+    __delay = __config['delay']
     __monitor['top'] = int(__config['resolutionHeight'] / 5)
     __monitor['height'] = int(__config['resolutionHeight'] / 5 * 3)
     __monitor['left'] = 0
     __monitor['width'] = int(__config['resolutionWidth'] / 4 * 3)
 
 def __getGlobalPoint(x, y):
+    global __monitor
     return (x + __monitor['left'], y + __monitor['top'])
 
 def __checkPause():
@@ -33,12 +35,17 @@ def __checkPause():
     return
 
 def __openChatWindow():
+    global __autoPy
+    global __delay
     __checkPause()
     __autoPy.F1.press()
     __autoPy.F1.press()
     time.sleep(__delay)
 
 def __detectChatWindowScroll():
+    global __monitor
+    global __chatWindowTemplate
+    global __delay
     with mss.mss() as screenshotManager:
         while True:
             __checkPause()
@@ -62,14 +69,16 @@ def __detectChatWindowScroll():
             time.sleep(__delay)
 
 def __scrollChatWindow(point):
+    global __autoPy
+    global __delay
     __checkPause()
     __autoPy.moveMouseToPosition(point[0], point[1])
     stroke = InterceptionMouseStroke()
     stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_DOWN
-    autohot_py.sendToDefaultMouse(stroke)
+    __autoPy.sendToDefaultMouse(stroke)
     __autoPy.moveMouseToPosition(point[0], point[1] + 295)
-    stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_RIGHT_BUTTON_UP
-    autohot_py.sendToDefaultMouse(stroke)
+    stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_UP
+    __autoPy.sendToDefaultMouse(stroke)
     time.sleep(__delay)
 
 def proceed(autohotpy, event):
@@ -83,6 +92,7 @@ def proceed(autohotpy, event):
     autohotpy.run(proceed, event)
 
 def run():
+    global __autoPy
     __init()
     __autoPy.registerExit(__autoPy.END, __onExit)
     __autoPy.registerForKeyDown(__autoPy.F12, __switchPause)
@@ -91,10 +101,10 @@ def run():
 
 def __onExit(autohotpy, event):
     autohotpy.stop()
+    raise Exception('exit')
 
 def __switchPause(autohotpy, event):
     global __paused
-
     __paused = not __paused
     print('Paused' if __paused else 'Resumed')
     if not __paused:
@@ -102,7 +112,10 @@ def __switchPause(autohotpy, event):
 
 
 def main():
-    run()
+    try:
+        run()
+    except:
+        print('Good bye')
 
 if __name__ == '__main__':
     main()
