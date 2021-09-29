@@ -12,7 +12,8 @@
     <Name>asteriosManor</Name>
     <RootNamespace>asteriosManor</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
-    <InterpreterId>Global|PythonCore|3.9</InterpreterId>
+    <InterpreterId>
+    </InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -27,12 +28,21 @@
     <Compile Include="captchaHelper.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="lib\AutoHotPy.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="lib\InterceptionWrapper.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="lib\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="utils.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <InterpreterReference Include="Global|PythonCore|3.9" />
+    <Folder Include="lib\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
