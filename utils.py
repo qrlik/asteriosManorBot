@@ -19,6 +19,21 @@ def searchTemplate(source, template, factor):
     res = cv2.matchTemplate(source, template, cv2.TM_CCOEFF_NORMED)
     return numpy.where(res >= factor)
 
+def detectTemplateCenter(template, factor):
+    img = grabImage()
+    loc = searchTemplate(img, template, factor)
+
+    for point in zip(*loc[::-1]):
+        templateHeight = template.shape[0]
+        templateWidth = template.shape[1]
+        #cv2.rectangle(img, point, (point[0] + templateWidth, point[1] + templateHeight), (0, 255, 0), 3)
+        globalPoint = getGlobalPoint(point[0], point[1])
+        globalPointCenter = (int(globalPoint[0] + templateWidth / 2), int(globalPoint[1] + templateHeight / 2))
+        return globalPointCenter
+    #cv2.imshow("test", img)
+    #key = cv2.waitKey(1)
+    return None
+
 def grabImage():
     global __monitor
     with mss.mss() as screenshotManager:

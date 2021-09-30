@@ -26,25 +26,6 @@ def __openChatWindow():
     __autoPy.F1.press()
     time.sleep(__delay)
 
-def __detectChatWindowScroll():
-    global __monitor
-    global __chatScrollTemplate
-    global __delay
-    while True:
-        img = utils.grabImage()
-        loc = utils.searchTemplate(img, __chatScrollTemplate, 0.9)
-
-        for point in zip(*loc[::-1]):
-            templateHeight = __chatScrollTemplate.shape[0]
-            templateWidth = __chatScrollTemplate.shape[1]
-            #cv2.rectangle(img, point, (point[0] + templateWidth, point[1] + templateHeight), (0, 255, 0), 3) #debug
-            scrollPoint = utils.getGlobalPoint(point[0], point[1])
-            scrollMiddlePoint = (int(scrollPoint[0] + templateWidth / 2), int(scrollPoint[1] + templateHeight / 2))
-            return scrollMiddlePoint
-        #cv2.imshow("test", img) #debug
-        #key = cv2.waitKey(1)
-        time.sleep(__delay)
-
 def __scrollChatWindow(point):
     global __autoPy
     global __delay
@@ -68,15 +49,20 @@ def __openCaptchaWindow(point):
     stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_UP
     autohotpy.sendToDefaultMouse(stroke)
     time.sleep(__delay)
-       
+ 
+def __macros():
+    global __chatScrollTemplate
+    #with pyautogui.hold('shift'):
+    __openChatWindow()
+    scrollPoint = utils.detectTemplateCenter(__chatScrollTemplate, 0.9)
+    if not scrollPoint:
+        return
+    __scrollChatWindow(scrollPoint)
+    __openCaptchaWindow(scrollPoint)
 
 def proceed(autohotpy, event):
     global __paused
-    #with pyautogui.hold('shift'):
-    __openChatWindow()
-    scrollPoint = __detectChatWindowScroll()
-    __scrollChatWindow(scrollPoint)
-    __openCaptchaWindow(scrollPoint)
+    __macros()
     if not __paused:
         autohotpy.run(proceed, event)
 
