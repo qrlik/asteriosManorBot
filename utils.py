@@ -15,6 +15,10 @@ def getGlobalPoint(x, y):
     global __monitor
     return (x + __monitor['left'], y + __monitor['top'])
 
+def searchTemplate(source, template, factor):
+    res = cv2.matchTemplate(source, template, cv2.TM_CCOEFF_NORMED)
+    return numpy.where(res >= factor)
+
 def grabImage():
     global __monitor
     with mss.mss() as screenshotManager:

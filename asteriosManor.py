@@ -8,7 +8,7 @@ import utils
 import time
 
 __autoPy = AutoHotPy()
-__chatWindowTemplate = cv2.imread("assets/chatScroll.png", cv2.IMREAD_GRAYSCALE)
+__chatScrollTemplate = cv2.imread("assets/chatScroll.png", cv2.IMREAD_GRAYSCALE)
 __config = utils.loadJsonFile('config')
 __delay = 0.0
 __paused = True
@@ -28,16 +28,15 @@ def __openChatWindow():
 
 def __detectChatWindowScroll():
     global __monitor
-    global __chatWindowTemplate
+    global __chatScrollTemplate
     global __delay
     while True:
         img = utils.grabImage()
-        res = cv2.matchTemplate(img, __chatWindowTemplate, cv2.TM_CCOEFF_NORMED)
-        loc = numpy.where(res >= 0.9)
+        loc = utils.searchTemplate(img, __chatScrollTemplate, 0.9)
 
         for point in zip(*loc[::-1]):
-            templateHeight = __chatWindowTemplate.shape[0]
-            templateWidth = __chatWindowTemplate.shape[1]
+            templateHeight = __chatScrollTemplate.shape[0]
+            templateWidth = __chatScrollTemplate.shape[1]
             #cv2.rectangle(img, point, (point[0] + templateWidth, point[1] + templateHeight), (0, 255, 0), 3) #debug
             scrollPoint = utils.getGlobalPoint(point[0], point[1])
             scrollMiddlePoint = (int(scrollPoint[0] + templateWidth / 2), int(scrollPoint[1] + templateHeight / 2))
