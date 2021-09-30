@@ -1,15 +1,12 @@
 from lib.AutoHotPy import AutoHotPy
 from lib.InterceptionWrapper import InterceptionMouseState, InterceptionMouseStroke
-from pynput import keyboard  # слушатель ввода
-import numpy  # поддержка многомерных массивов | поддержка высокоуровневых математических функций
 import cv2  # openCV
-import mss  # создания скриншотов
 import utils
 import time
+import captchaHelper
 
 __autoPy = AutoHotPy()
 __chatScrollTemplate = cv2.imread("assets/chatScroll.png", cv2.IMREAD_GRAYSCALE)
-__captchaInputTemplate = cv2.imread("assets/captchaInput.png", cv2.IMREAD_GRAYSCALE)
 __config = None
 __delay = 0.0
 __paused = True
@@ -58,21 +55,28 @@ def __openCaptchaWindow(point):
  
 def __macros():
     global __chatScrollTemplate
-    global __captchaInputTemplate
-    #'shift'
+    global __delay
+    #'shift' hold
 
-    __openChatWindow()
-    scrollCenterPoint = utils.detectTemplatePivot(__chatScrollTemplate, 0.9, (0.5, 0.5))
-    if not scrollCenterPoint:
+    #__openChatWindow()
+    #scrollCenterPoint = utils.detectTemplatePivot(utils.grabImage(), __chatScrollTemplate, 0.8, (0.5, 0.5))
+    #if not scrollCenterPoint:
+    #    return
+    #__scrollChatWindow(scrollCenterPoint)
+    #__openCaptchaWindow(scrollCenterPoint)
+    captchaResult = captchaHelper.proceedCaptcha()
+    if not captchaResult:
         return
-    __scrollChatWindow(scrollCenterPoint)
-    __openCaptchaWindow(scrollCenterPoint)
-    captchaPoint = utils.detectTemplate(__captchaInputTemplate, 0.9)
+
+    #'shift' up
+    time.sleep(__delay)
+
 
 def proceed(autohotpy, event):
     global __paused
     __updateConfig()
     __macros()
+    #few 'esc'
     if not __paused:
         autohotpy.run(proceed, event)
 
@@ -93,7 +97,8 @@ def run():
     __init()
     __autoPy.registerForKeyDown(__autoPy.F11, __switchPause)
     __autoPy.registerExit(__autoPy.ESC, __onExit)
-    __autoPy.start()
+    #__autoPy.start()
+    __macros()
 
     
 
