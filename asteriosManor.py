@@ -9,13 +9,19 @@ import time
 
 __autoPy = AutoHotPy()
 __chatScrollTemplate = cv2.imread("assets/chatScroll.png", cv2.IMREAD_GRAYSCALE)
-__config = utils.loadJsonFile('config')
+__captchaInputTemplate = cv2.imread("assets/captchaInput.png", cv2.IMREAD_GRAYSCALE)
+__config = None
 __delay = 0.0
 __paused = True
     
+def __updateConfig():
+    global __config
+    __config = utils.loadJsonFile('config')
+
 def __init():
     global __config
     global __delay
+    __updateConfig()
     __delay = __config['delay']
     utils.init(__config)
 
@@ -52,16 +58,20 @@ def __openCaptchaWindow(point):
  
 def __macros():
     global __chatScrollTemplate
-    #with pyautogui.hold('shift'):
+    global __captchaInputTemplate
+    #'shift'
+
     __openChatWindow()
-    scrollPoint = utils.detectTemplateCenter(__chatScrollTemplate, 0.9)
-    if not scrollPoint:
+    scrollCenterPoint = utils.detectTemplatePivot(__chatScrollTemplate, 0.9, (0.5, 0.5))
+    if not scrollCenterPoint:
         return
-    __scrollChatWindow(scrollPoint)
-    __openCaptchaWindow(scrollPoint)
+    __scrollChatWindow(scrollCenterPoint)
+    __openCaptchaWindow(scrollCenterPoint)
+    captchaPoint = utils.detectTemplate(__captchaInputTemplate, 0.9)
 
 def proceed(autohotpy, event):
     global __paused
+    __updateConfig()
     __macros()
     if not __paused:
         autohotpy.run(proceed, event)
