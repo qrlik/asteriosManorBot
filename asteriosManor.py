@@ -6,28 +6,18 @@ import cv2  # openCV
 import mss  # создания скриншотов
 import utils
 import time
-import threading
 
 __autoPy = AutoHotPy()
 __chatWindowTemplate = cv2.imread("assets/chatScroll.png", cv2.IMREAD_GRAYSCALE)
 __config = utils.loadJsonFile('config')
-__monitor = {"top": 0, "left": 0, "width": 0, "height": 0}
 __delay = 0.0
 __paused = True
     
 def __init():
-    global __monitor
     global __config
     global __delay
     __delay = __config['delay']
-    __monitor['top'] = int(__config['resolutionHeight'] / 5)
-    __monitor['height'] = int(__config['resolutionHeight'] / 5 * 3)
-    __monitor['left'] = 0
-    __monitor['width'] = int(__config['resolutionWidth'] / 4 * 3)
-
-def __getGlobalPoint(x, y):
-    global __monitor
-    return (x + __monitor['left'], y + __monitor['top'])
+    utils.init(__config)
 
 def __openChatWindow():
     global __autoPy
@@ -40,23 +30,21 @@ def __detectChatWindowScroll():
     global __monitor
     global __chatWindowTemplate
     global __delay
-    with mss.mss() as screenshotManager:
-        while True:
-            img = numpy.array(screenshotManager.grab(__monitor))
-            processedImage = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            res = cv2.matchTemplate(processedImage, __chatWindowTemplate, cv2.TM_CCOEFF_NORMED)
-            loc = numpy.where(res >= 0.9)
+    while True:
+        img = utils.grabImage()
+        res = cv2.matchTemplate(img, __chatWindowTemplate, cv2.TM_CCOEFF_NORMED)
+        loc = numpy.where(res >= 0.9)
 
-            for point in zip(*loc[::-1]):
-                templateHeight = __chatWindowTemplate.shape[0]
-                templateWidth = __chatWindowTemplate.shape[1]
-                #cv2.rectangle(img, point, (point[0] + templateWidth, point[1] + templateHeight), (0, 255, 0), 3) #debug
-                scrollPoint = __getGlobalPoint(point[0], point[1])
-                scrollMiddlePoint = (int(scrollPoint[0] + templateWidth / 2), int(scrollPoint[1] + templateHeight / 2))
-                return scrollMiddlePoint
-            #cv2.imshow("test", img) #debug
-            #key = cv2.waitKey(1)
-            time.sleep(__delay)
+        for point in zip(*loc[::-1]):
+            templateHeight = __chatWindowTemplate.shape[0]
+            templateWidth = __chatWindowTemplate.shape[1]
+            #cv2.rectangle(img, point, (point[0] + templateWidth, point[1] + templateHeight), (0, 255, 0), 3) #debug
+            scrollPoint = utils.getGlobalPoint(point[0], point[1])
+            scrollMiddlePoint = (int(scrollPoint[0] + templateWidth / 2), int(scrollPoint[1] + templateHeight / 2))
+            return scrollMiddlePoint
+        #cv2.imshow("test", img) #debug
+        #key = cv2.waitKey(1)
+        time.sleep(__delay)
 
 def __scrollChatWindow(point):
     global __autoPy
