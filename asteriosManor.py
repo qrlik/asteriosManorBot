@@ -71,12 +71,25 @@ def __scrollChatWindow(point):
     __autoPy.sendToDefaultMouse(stroke)
     time.sleep(__delay)
 
+def __openCaptchaWindow(point):
+    global __autoPy
+    global __delay
+    __autoPy.moveMouseToPosition(point[0] - 195, point[1] + 100)
+    stroke = InterceptionMouseStroke()
+    stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_DOWN
+    autohotpy.sendToDefaultMouse(stroke)
+    stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_UP
+    autohotpy.sendToDefaultMouse(stroke)
+    time.sleep(__delay)
+       
+
 def proceed(autohotpy, event):
     global __paused
     #with pyautogui.hold('shift'):
     __openChatWindow()
     scrollPoint = __detectChatWindowScroll()
     __scrollChatWindow(scrollPoint)
+    __openCaptchaWindow(scrollPoint)
     if not __paused:
         autohotpy.run(proceed, event)
 
