@@ -48,7 +48,7 @@ def __openCaptchaWindow(point):
     global __autoPy
     global __chatButtonTemplate
     global __delay
-    chatPoint = utils.detectTemplatePivot(utils.grabImage(), __chatButtonTemplate, 0.8, (0.5, 0.5))
+    chatPoint = utils.detectTemplatePivot(utils.grabImage(), __chatButtonTemplate, 0.6, (0.5, 0.5))
     if not chatPoint:
         return False
     __autoPy.moveMouseToPosition(chatPoint[0], chatPoint[1])

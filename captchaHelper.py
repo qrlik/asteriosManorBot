@@ -42,12 +42,7 @@ def __enterCaptcha(img, autohotpy, inputCenter, captcha):
     utils.leftClick(autohotpy)
     utils.minSleep()
 
-
     digits = utils.getNumberDigits(captcha);
-    
-    print(captcha)
-    print(digits)
-
     for digit in digits:
         utils.pressDigit(autohotpy, digit)
 
@@ -64,11 +59,12 @@ def proceedCaptcha(autohotpy):
     imageAndPoint = __getCaptchaImageAndPoint(screenImg)
     if not imageAndPoint:
         return False
-    
+
     cv2.imwrite('images/captchaImage.png', imageAndPoint[0])
-    ret, threshold = cv2.threshold(imageAndPoint[0], 140, 255, cv2.THRESH_BINARY)
-    cv2.imwrite('images/captchaImageThreshold.png', threshold)
-    text = pytesseract.image_to_string(threshold)
+    ret, threshold = cv2.threshold(imageAndPoint[0], 90, 255, cv2.THRESH_BINARY)
+    invert = cv2.bitwise_not(threshold)
+    cv2.imwrite('images/captchaImageThresholdInvert.png', invert)
+    text = pytesseract.image_to_string(invert)
 
     result = __getCaptchaResult(text)
     success = __enterCaptcha(screenImg, autohotpy, imageAndPoint[1], result)
