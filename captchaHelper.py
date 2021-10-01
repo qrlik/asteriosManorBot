@@ -30,6 +30,7 @@ def __getCaptchaImageAndPoint(img):
 def __getCaptchaResult(text):
     findResult = re.findall(r'\d+', text)
     sum = 0
+    print(findResult)
     for digitStr in findResult:
         sum += int(digitStr)
     return sum
@@ -41,7 +42,12 @@ def __enterCaptcha(img, autohotpy, inputCenter, captcha):
     utils.leftClick(autohotpy)
     utils.minSleep()
 
+
     digits = utils.getNumberDigits(captcha);
+    
+    print(captcha)
+    print(digits)
+
     for digit in digits:
         utils.pressDigit(autohotpy, digit)
 
@@ -62,7 +68,7 @@ def proceedCaptcha(autohotpy):
     cv2.imwrite('images/captchaImage.png', imageAndPoint[0])
     ret, threshold = cv2.threshold(imageAndPoint[0], 140, 255, cv2.THRESH_BINARY)
     cv2.imwrite('images/captchaImageThreshold.png', threshold)
-    text = pytesseract.image_to_string(threshold, lang='eng', config='--psm 7')
+    text = pytesseract.image_to_string(threshold)
 
     result = __getCaptchaResult(text)
     success = __enterCaptcha(screenImg, autohotpy, imageAndPoint[1], result)
