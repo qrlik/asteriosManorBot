@@ -7,6 +7,7 @@ import captchaHelper
 
 __autoPy = AutoHotPy()
 __chatScrollTemplate = cv2.imread("assets/chatScroll.png", cv2.IMREAD_GRAYSCALE)
+__chatButtonTemplate = cv2.imread("assets/chatButton.png", cv2.IMREAD_GRAYSCALE)
 __config = None
 __delay = 0.0
 __paused = True
@@ -45,10 +46,15 @@ def __scrollChatWindow(point):
 
 def __openCaptchaWindow(point):
     global __autoPy
+    global __chatButtonTemplate
     global __delay
-    __autoPy.moveMouseToPosition(point[0] - 200, point[1] + 80)
+    chatPoint = utils.detectTemplatePivot(grabImage(), __chatButtonTemplate, 0.8, (0.5, 0.5))
+    if not chatPoint:
+        return False
+    __autoPy.moveMouseToPosition(chatPoint[0], chatPoint[1])
     utils.leftClick(__autoPy)
     time.sleep(__delay * 2)
+    return True
  
 def __macros():
     global __chatScrollTemplate
@@ -58,11 +64,18 @@ def __macros():
     __openChatWindow()
     scrollCenterPoint = utils.detectTemplatePivot(utils.grabImage(), __chatScrollTemplate, 0.8, (0.5, 0.5))
     if not scrollCenterPoint:
+        print('No scrollCenterPoint')
         return
+
     __scrollChatWindow(scrollCenterPoint)
-    __openCaptchaWindow(scrollCenterPoint)
+    openCaptchaResult = __openCaptchaWindow(scrollCenterPoint)
+    if not openCaptchaResult:
+        print('No openCaptchaResult')
+        return
+
     captchaResult = captchaHelper.proceedCaptcha(__autoPy)
     if not captchaResult:
+        print('No captchaResult')
         return
 
     time.sleep(__delay)

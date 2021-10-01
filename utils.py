@@ -25,6 +25,7 @@ def getGlobalPoint(x, y):
     return (x + __monitor['left'], y + __monitor['top'])
 
 def searchTemplate(source, template, factor):
+    cv2.imwrite('images/lastTemplate.png', template)
     res = cv2.matchTemplate(source, template, cv2.TM_CCOEFF_NORMED)
     return numpy.where(res >= factor)
 
@@ -32,6 +33,7 @@ def grabImage():
     global __monitor
     with mss.mss() as screenshotManager:
         img = numpy.array(screenshotManager.grab(__monitor))
+        cv2.imwrite('images/lastGrabbed.png', img)
         return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 def detectTemplate(source, template, factor, globalPos=True):
