@@ -3,13 +3,14 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>35b1df7c-a46f-425c-8951-07f86b3ae4ae</ProjectGuid>
-    <ProjectHome>.</ProjectHome>
-    <StartupFile>asteriosManor.py</StartupFile>
+    <ProjectHome>
+    </ProjectHome>
+    <StartupFile>asterios.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>asteriosManor</Name>
+    <Name>Asterios</Name>
     <RootNamespace>asteriosManor</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
     <InterpreterId>
@@ -24,7 +25,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="asteriosManor.py" />
+    <Compile Include="asterios.py" />
     <Compile Include="captchaHelper.py">
       <SubType>Code</SubType>
     </Compile>

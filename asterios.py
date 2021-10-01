@@ -36,7 +36,7 @@ def __scrollChatWindow(point):
     stroke = InterceptionMouseStroke()
     stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_DOWN
     __autoPy.sendToDefaultMouse(stroke)
-    time.sleep(__delay)
+    utils.minSleep()
     __autoPy.moveMouseToPosition(point[0], point[1] + 295)
     stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_UP
     __autoPy.sendToDefaultMouse(stroke)
@@ -45,28 +45,26 @@ def __scrollChatWindow(point):
 def __openCaptchaWindow(point):
     global __autoPy
     global __delay
-    __autoPy.moveMouseToPosition(point[0] - 195, point[1] + 100)
-    stroke = InterceptionMouseStroke()
-    stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_DOWN
-    autohotpy.sendToDefaultMouse(stroke)
-    stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_UP
-    autohotpy.sendToDefaultMouse(stroke)
+    __autoPy.moveMouseToPosition(point[0] - 200, point[1] + 80)
+    utils.leftClick(__autoPy)
     time.sleep(__delay)
  
 def __macros():
     global __chatScrollTemplate
+    global __autoPy
     global __delay
     #'shift' hold
 
-    #__openChatWindow()
-    #scrollCenterPoint = utils.detectTemplatePivot(utils.grabImage(), __chatScrollTemplate, 0.8, (0.5, 0.5))
-    #if not scrollCenterPoint:
-    #    return
-    #__scrollChatWindow(scrollCenterPoint)
-    #__openCaptchaWindow(scrollCenterPoint)
-    captchaResult = captchaHelper.proceedCaptcha()
+    __openChatWindow()
+    scrollCenterPoint = utils.detectTemplatePivot(utils.grabImage(), __chatScrollTemplate, 0.8, (0.5, 0.5))
+    if not scrollCenterPoint:
+        return
+    __scrollChatWindow(scrollCenterPoint)
+    __openCaptchaWindow(scrollCenterPoint)
+    captchaResult = captchaHelper.proceedCaptcha(__autoPy)
     if not captchaResult:
         return
+    time.sleep(__delay)
 
     #'shift' up
     time.sleep(__delay)
@@ -97,16 +95,12 @@ def run():
     __init()
     __autoPy.registerForKeyDown(__autoPy.F11, __switchPause)
     __autoPy.registerExit(__autoPy.ESC, __onExit)
-    #__autoPy.start()
-    __macros()
+    __autoPy.start()
 
     
 
 def main():
     run()
-
-    #__init() # debug
-    #proceed(None, None)
 
 if __name__ == '__main__':
     main()

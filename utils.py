@@ -1,9 +1,17 @@
+from lib.AutoHotPy import AutoHotPy
+from lib.InterceptionWrapper import InterceptionMouseState, InterceptionMouseStroke
 import cv2  # openCV
 import numpy  # поддержка многомерных массивов | поддержка высокоуровневых математических функций
 import mss  # создания скриншотов
 import json
+import time
 
 __monitor = {"top": 0, "left": 0, "width": 0, "height": 0}
+__minDelay = 0.1
+
+def minSleep():
+    global __minDelay
+    time.sleep(__minDelay)
 
 def init(config):
     global __monitor
@@ -47,6 +55,42 @@ def detectTemplatePivot(source, template, factor, pivot, globalPos=True):
     templateWidth = template.shape[1]
     pointPivot = (int(point[0] + templateWidth * pivot[0]), int(point[1] + templateHeight * pivot[1]))
     return pointPivot
+
+def leftClick(autohotpy):
+    stroke = InterceptionMouseStroke()
+    stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_DOWN
+    autohotpy.sendToDefaultMouse(stroke)
+    stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_UP
+    autohotpy.sendToDefaultMouse(stroke)
+
+def pressDigit(autohotpy, digit):
+    if digit == 0:
+        autohotpy.N0.press()
+    elif digit == 1:
+        autohotpy.N1.press()
+    elif digit == 2:
+        autohotpy.N2.press()
+    elif digit == 3:
+        autohotpy.N3.press()
+    elif digit == 4:
+        autohotpy.N4.press()
+    elif digit == 5:
+        autohotpy.N5.press()
+    elif digit == 6:
+        autohotpy.N6.press()
+    elif digit == 7:
+        autohotpy.N7.press()
+    elif digit == 8:
+        autohotpy.N8.press()
+    elif digit == 9:
+        autohotpy.N9.press()
+
+def getNumberDigits(number):
+    digits = []
+    numberStr = str(number)
+    for digit in numberStr:
+        digits.append(int(digit))
+    return digits
 
 def loadJsonFile(filename):
     try:
