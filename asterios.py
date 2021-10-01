@@ -26,6 +26,7 @@ def __openChatWindow():
     global __autoPy
     global __delay
     __autoPy.F1.press()
+    utils.minSleep()
     __autoPy.F1.press()
     time.sleep(__delay)
 
@@ -74,7 +75,15 @@ def proceed(autohotpy, event):
     global __paused
     __updateConfig()
     __macros()
-    #few 'esc'
+    
+    utils.minSleep()
+    autohotpy.ESC.press()
+    utils.minSleep()
+    autohotpy.ESC.press()
+    utils.minSleep()
+    autohotpy.ESC.press()
+    utils.minSleep()
+
     if not __paused:
         autohotpy.run(proceed, event)
 

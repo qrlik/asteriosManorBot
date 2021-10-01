@@ -84,6 +84,7 @@ def pressDigit(autohotpy, digit):
         autohotpy.N8.press()
     elif digit == 9:
         autohotpy.N9.press()
+    minSleep()
 
 def getNumberDigits(number):
     digits = []

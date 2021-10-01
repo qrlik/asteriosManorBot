@@ -44,10 +44,9 @@ def __enterCaptcha(img, autohotpy, inputCenter, captcha):
     digits = utils.getNumberDigits(captcha);
     for digit in digits:
         utils.pressDigit(autohotpy, digit)
-        utils.minSleep()
 
     checkPoint = utils.detectTemplatePivot(img, __captchaCheckTemplate, 0.8, (0.5, 0.5))
-    if not checkPoint
+    if not checkPoint:
         return False
     autohotpy.moveMouseToPosition(checkPoint[0], checkPoint[1])
     utils.minSleep()
@@ -66,14 +65,5 @@ def proceedCaptcha(autohotpy):
     text = pytesseract.image_to_string(threshold, lang='eng', config='--psm 7')
 
     result = __getCaptchaResult(text)
-    
-    attempts = 2
-    while attempts > 0:
-        success = __enterCaptcha(screenImg, autohotpy, imageAndPoint[1], result)
-        attempts -= 1
-        if success
-            break
-        elif not success and attempts == 0:
-            return False
-
-    return True
+    success = __enterCaptcha(screenImg, autohotpy, imageAndPoint[1], result)
+    return success
