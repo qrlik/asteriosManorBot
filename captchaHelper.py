@@ -12,7 +12,6 @@ __captchaCheckTemplate = cv2.imread("assets/captchaCheck.png", cv2.IMREAD_GRAYSC
 
 def __getCaptchaImageAndPoint(img):
     global __captchaInputTemplate
-    cv2.imwrite('images/grabForCaptcha.png', img)
     captchaPoint = utils.detectTemplate(img, __captchaInputTemplate, 0.8, False)
     if not captchaPoint:
         return None
@@ -25,10 +24,21 @@ def __getCaptchaImageAndPoint(img):
     y1 = captchaPoint[1] - 30
     y2 = captchaPoint[1] - 5
     x2 = captchaPoint[0] + 200
-    return (img[y1:y2, captchaPoint[0]:x2], captchaPointCenter)
+
+    captcha = img[y1:y2, captchaPoint[0]:x2]
+    return (captcha, captchaPointCenter)
 
 def __getCaptchaResult(text):
+    text = text.replace('g', '8')
+    text = text.replace('s', '8')
+    text = text.replace('?', '7')
+
     findResult = re.findall(r'\d+', text)
+
+    if len(findResult) > 2:
+        findResult[0] += findResult[1]
+        findResult.pop(1)
+
     sum = 0
     print(findResult)
     for digitStr in findResult:
@@ -54,18 +64,52 @@ def __enterCaptcha(img, autohotpy, inputCenter, captcha):
     utils.leftClick(autohotpy)
     return True
 
+def __processImage(img):
+    ret, threshold = cv2.threshold(img, 90, 255, cv2.THRESH_BINARY)
+
+    rect_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 3))
+    dilation = cv2.dilate(threshold, rect_kernel, iterations = 1)
+    contours, hierarchy = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    for cnt in contours:
+            x, y, w, h = cv2.boundingRect(cnt)
+            threshold[0:threshold.shape[0], x:x + 78] = 0
+            threshold[0:threshold.shape[0], x + w - 12:x + w] = 0
+
+    contours, hierarchy = cv2.findContours(threshold, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    contoursList = []
+    for cnt in contours:
+        x, y, w, h = cv2.boundingRect(cnt)
+        contoursList.append((x, cnt))
+    contoursList.sort(key=lambda tup: tup[0], reverse=True)
+    currX = contoursList[0][0]
+    for i, tupl in enumerate(contoursList):
+        delta = currX - tupl[0]
+        if delta > 9:
+            x, y, w, h = cv2.boundingRect(tupl[1])
+            threshold[0:threshold.shape[0], x:x + w] = 0
+            break
+        currX = tupl[0]
+
+    return threshold
+
 def proceedCaptcha(autohotpy):
     screenImg = utils.grabImage()
     imageAndPoint = __getCaptchaImageAndPoint(screenImg)
     if not imageAndPoint:
         return False
 
-    cv2.imwrite('images/captchaImage.png', imageAndPoint[0])
-    ret, threshold = cv2.threshold(imageAndPoint[0], 90, 255, cv2.THRESH_BINARY)
-    invert = cv2.bitwise_not(threshold)
-    cv2.imwrite('images/captchaImageThresholdInvert.png', invert)
-    text = pytesseract.image_to_string(invert)
+    finalImage = __processImage(imageAndPoint[0])
+    text = pytesseract.image_to_string(finalImage, config='--psm 11')
 
     result = __getCaptchaResult(text)
     success = __enterCaptcha(screenImg, autohotpy, imageAndPoint[1], result)
     return success
+
+if __name__ == '__main__':
+    captchaTest = cv2.imread('images/captchaImage6.png', cv2.IMREAD_GRAYSCALE)
+    finalImage = __processImage(captchaTest)
+
+    text = pytesseract.image_to_string(finalImage, config='--psm 11') # 4 6 7 10
+    print(text)
+    result = __getCaptchaResult(text)
+    print(result)
