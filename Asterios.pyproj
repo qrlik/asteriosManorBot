@@ -5,7 +5,7 @@
     <ProjectGuid>35b1df7c-a46f-425c-8951-07f86b3ae4ae</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>captchaHelper.py</StartupFile>
+    <StartupFile>asterios.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -36,6 +36,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="lib\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="manorHelper.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="utils.py">

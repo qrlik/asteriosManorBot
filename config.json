@@ -1,4 +1,5 @@
 {
+	"minDelay": 0.1,
 	"delay": 0.2,
 	"resolutionWidth": 1920,
 	"resolutionHeight": 1080

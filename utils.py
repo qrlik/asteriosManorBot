@@ -7,18 +7,37 @@ import json
 import time
 
 __monitor = {"top": 0, "left": 0, "width": 0, "height": 0}
-__minDelay = 0.1
+__minDelay = 0.0
+__delay = 0.0
+__config = {}
+
+def updateConfig():
+    global __config
+    __config = loadJsonFile('config')
+    __init()
 
 def minSleep():
     global __minDelay
     time.sleep(__minDelay)
 
-def init(config):
+def sleep(factor=None):
+    global __delay
+    delay = __delay
+    if factor:
+        delay *= factor
+    time.sleep(delay)
+
+def __init():
+    global __config
+    global __minDelay
+    global __delay
     global __monitor
-    __monitor['top'] = int(config['resolutionHeight'] / 5)
-    __monitor['height'] = int(config['resolutionHeight'] / 5 * 3)
+    __minDelay = __config['minDelay']
+    __delay = __config['delay']
+    __monitor['top'] = int(__config['resolutionHeight'] / 5)
+    __monitor['height'] = int(__config['resolutionHeight'] / 5 * 3)
     __monitor['left'] = 0
-    __monitor['width'] = int(config['resolutionWidth'] / 4 * 3)
+    __monitor['width'] = int(__config['resolutionWidth'] / 4 * 3)
 
 def getGlobalPoint(x, y):
     global __monitor
@@ -62,6 +81,7 @@ def leftClick(autohotpy):
     stroke = InterceptionMouseStroke()
     stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_DOWN
     autohotpy.sendToDefaultMouse(stroke)
+    minSleep()
     stroke.state = InterceptionMouseState.INTERCEPTION_MOUSE_LEFT_BUTTON_UP
     autohotpy.sendToDefaultMouse(stroke)
 

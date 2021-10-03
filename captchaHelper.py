@@ -62,6 +62,7 @@ def __enterCaptcha(img, autohotpy, inputCenter, captcha):
     autohotpy.moveMouseToPosition(checkPoint[0], checkPoint[1])
     utils.minSleep()
     utils.leftClick(autohotpy)
+    utils.sleep()
     return True
 
 def __processImage(img):
